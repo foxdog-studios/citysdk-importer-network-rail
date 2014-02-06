@@ -22,6 +22,21 @@ def parse_options
     opt(:naptan_csv,
         'NaPTAN Rail Reference CSV',
         :type => :string)
+    opt(:layer_name,
+        'Name of layer to import Network Rail data to',
+        :type => :string)
+    opt(:layer_description,
+        'Description of layer to import Network Rail data to',
+        :type => :string)
+    opt(:layer_organization,
+        'Organization of layer to import Network Rail data to',
+        :type => :string)
+    opt(:layer_category,
+        'Category of layer to import Network Rail data to',
+        :type => :string)
+    opt(:layer_webservice,
+        'Webservice of layer to import Network Rail data to',
+        :type => :string)
   end # do
 
   if opts[:config]
@@ -30,7 +45,15 @@ def parse_options
     opts = opts.merge(config)
   end # if
 
-  [:username, :password, :host_url, :naptan_csv].each do |option|
+  [:username,
+   :password,
+   :host_url,
+   :naptan_csv,
+   :layer_name,
+   :layer_description,
+   :layer_organization,
+   :layer_category,
+   :layer_webservice].each do |option|
     unless opts[option]
       Trollop::die option, 'must be specified.'
     end # do
@@ -43,8 +66,7 @@ def get_naptan_rail_references(naptan_csv)
   CSV.read(naptan_csv, {headers: true})
 end # def
 
-def get_citysdk_railway_stations(host_url)
-  api = CitySDK::API.new(host_url)
+def get_citysdk_railway_stations(api)
   railway_station_node_iterator = CitySDK::NodesPaginator.new(api,
     'bbox' => '53.305202,-2.802939,53.716072,-1.820877',
     'layer' => 'osm',
@@ -99,15 +121,35 @@ def match?(station, rail_reference)
     or match_by_name?(station, rail_reference)
 end # def
 
+def create_layer(name, description, organization, category, webservice)
+
+end # def
+
+
 def main
   opts = parse_options()
 
   logger = Logger.new(STDOUT)
 
+  api = CitySDK::API.new(opts.fetch(:host_url))
+  api.set_credentials(opts.fetch(:username), opts.fetch(:password))
+  layer_name = opts.fetch(:layer_name)
+  unless api.layer?(layer_name)
+    logger.info("layer #{layer_name} does not exist, creating it")
+    api.create_layer(
+      name: layer_name,
+      organization: opts.fetch(:layer_organization),
+      category: opts.fetch(:layer_category),
+      description: opts.fetch(:layer_description),
+      webservice: opts.fetch(:layer_webservice)
+    )
+  end #unless
+
   logger.info('Reading naptan rail references')
   rail_references = get_naptan_rail_references(opts.fetch(:naptan_csv))
+
   logger.info('Getting stations from CitySDK API')
-  stations = get_citysdk_railway_stations(opts.fetch(:host_url))
+  stations = get_citysdk_railway_stations(api)
 
   logger.info('Matching csdk nodes to naptan rail references')
   matches = 0
@@ -117,6 +159,7 @@ def main
     rail_references.each do |rail_reference|
       if match?(station, rail_reference)
         cdk_nodes.push({
+          'cdk_id' => station.fetch('cdk_id'),
           'modalities' => ['rail'],
           'data' => {
             'tiploc_code' => rail_reference.fetch('TiplocCode')
@@ -132,10 +175,9 @@ def main
   end # do
   logger.info("#{matches}/#{stations.length} stations matched")
 
-  bulk_upload_data = {
-    'nodes' => cdk_nodes
-  }
-  puts JSON.pretty_generate(bulk_upload_data)
+  logger.info('Uploading nodes')
+  api.create_nodes(layer_name, cdk_nodes)
+  logger.info('Done :-)')
 end # def
 
 if __FILE__ == $0

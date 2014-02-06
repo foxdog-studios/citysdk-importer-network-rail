@@ -1,0 +1,10 @@
+{
+  "username": "penelope.pineapple@example.com",
+  "password": "my_password",
+  "host_url": "http://api.citysdk.example.com",
+  "layer_name": "my_domain.networkrail",
+  "layer_description": "Network rail schedule data",
+  "layer_organization": "Network Rail",
+  "layer_category": "mobility.public_transport",
+  "layer_webservice": "http://crazytrain.example.com/api/citysdk"
+}
