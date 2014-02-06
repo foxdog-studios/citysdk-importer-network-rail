@@ -68,7 +68,6 @@ end # def
 
 def get_citysdk_railway_stations(api)
   railway_station_node_iterator = CitySDK::NodesPaginator.new(api,
-    'bbox' => '53.305202,-2.802939,53.716072,-1.820877',
     'layer' => 'osm',
     'osm::railway' => 'station',
     'per_page' => '100'
