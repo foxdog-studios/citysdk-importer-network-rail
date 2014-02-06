@@ -1,12 +1,31 @@
+GIT
+  remote: git://github.com/foxdog-studios/citysdk-client
+  revision: 14eaee3a95dd48fe5af3285479aee77b1d0080bb
+  specs:
+    citysdk (0.1.2.1)
+      addressable (~> 2.3.5)
+      charlock_holmes (~> 0.6.9.4)
+      dbf
+      faraday (~> 0.8.5)
+      georuby (~> 2.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
-    stomp (1.3.2)
+    addressable (2.3.5)
+    charlock_holmes (0.6.9.4)
+    dbf (2.0.7)
+      fastercsv (~> 1.5.4)
+    faraday (0.8.9)
+      multipart-post (~> 1.2.0)
+    fastercsv (1.5.5)
+    georuby (2.0.0)
+    multipart-post (1.2.0)
     trollop (2.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  stomp (~> 1.3.2)
+  citysdk!
   trollop (~> 2.0)
