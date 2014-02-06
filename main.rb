@@ -111,10 +111,17 @@ def main
 
   logger.info('Matching csdk nodes to naptan rail references')
   matches = 0
+  cdk_nodes = []
   stations.each do |station|
     match = false
     rail_references.each do |rail_reference|
       if match?(station, rail_reference)
+        cdk_nodes.push({
+          'modalities' => ['rail'],
+          'data' => {
+            'tiploc_code' => rail_reference.fetch('TiplocCode')
+          }
+        })
         match = true
         matches += 1
       end # if
@@ -124,6 +131,11 @@ def main
     end # unless
   end # do
   logger.info("#{matches}/#{stations.length} stations matched")
+
+  bulk_upload_data = {
+    'nodes' => cdk_nodes
+  }
+  puts JSON.pretty_generate(bulk_upload_data)
 end # def
 
 if __FILE__ == $0
