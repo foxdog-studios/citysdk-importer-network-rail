@@ -6,5 +6,6 @@
   "layer_description": "Network rail schedule data",
   "layer_organization": "Network Rail",
   "layer_category": "mobility.public_transport",
-  "layer_webservice": "http://crazytrain.example.com/api/citysdk"
+  "layer_webservice": "http://crazytrain.example.com/api/citysdk",
+  "layer_update_rate": "0"
 }

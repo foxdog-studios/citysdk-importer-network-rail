@@ -37,6 +37,9 @@ def parse_options
     opt(:layer_webservice,
         'Webservice of layer to import Network Rail data to',
         :type => :string)
+    opt(:layer_update_rate,
+        'Timeout of layer data in memcache',
+        :type => :string)
   end # do
 
   if opts[:config]
@@ -53,7 +56,8 @@ def parse_options
    :layer_description,
    :layer_organization,
    :layer_category,
-   :layer_webservice].each do |option|
+   :layer_webservice,
+   :layer_update_rate].each do |option|
     unless opts[option]
       Trollop::die option, 'must be specified.'
     end # do
@@ -140,7 +144,8 @@ def main
       organization: opts.fetch(:layer_organization),
       category: opts.fetch(:layer_category),
       description: opts.fetch(:layer_description),
-      webservice: opts.fetch(:layer_webservice)
+      webservice: opts.fetch(:layer_webservice),
+      update_rate: opts.fetch(:layer_update_rate)
     )
   end #unless
 
