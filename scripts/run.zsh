@@ -17,7 +17,6 @@ fi
 
 cd ${0:h}/..
 bundle exec ruby ./main.rb \
-    --config ./local/config.json \
     --naptan-csv "${rail_reference}" \
     "${@}"
 

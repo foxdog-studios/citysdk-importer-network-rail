@@ -2,7 +2,7 @@ require 'csv'
 require 'json'
 require 'logger'
 
-require 'citysdk'
+require 'citysdk/client'
 require 'trollop'
 
 def parse_options
@@ -16,6 +16,8 @@ def parse_options
     opt(:host_url,
         'CitySDK endpoint URL',
         :type => :string)
+    opt(:do_not_verify_ssl,
+        'Verify CitySDK endpoint SSL certificate')
     opt(:password,
         'CitySDK password',
         :type => :string)
@@ -134,7 +136,13 @@ def main
 
   logger = Logger.new(STDOUT)
 
-  api = CitySDK::API.new(opts.fetch(:host_url))
+  conn = Faraday.new(
+    url: opts.fetch(:host_url),
+    headers: { content_type: 'application/json' },
+    ssl: { verify: !opts.fetch(:do_not_verify_ssl) }
+  )
+
+  api = CitySDK::API.new(conn)
   api.set_credentials(opts.fetch(:username), opts.fetch(:password))
   layer_name = opts.fetch(:layer_name)
   unless api.layer?(layer_name)
